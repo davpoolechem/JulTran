@@ -9,11 +9,13 @@ function hello_julia_impl(mutex)
     #***********************#
     #* perform calculation *#
     #***********************#
-    Threads.@threads for i in 1:Threads.nthreads()
+    #OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i) NUM_THREADS(4)
+    Threads.@threads for i in 1:1:Threads.nthreads()
         lock(mutex)
         println("Hello from Julia thread ",Threads.threadid())
         unlock(mutex)
     end
+    #END OMP PARALLEL DO
     println("")
 end
 #endfxn
