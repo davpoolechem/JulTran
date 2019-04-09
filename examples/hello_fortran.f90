@@ -10,13 +10,13 @@ integer function hello_fortran()
   !***********************!
   !* perform calculation *!
   !***********************!
-  !$OMP PARALLEL SHARED(i) NUM_THREADS(4)
-  !$OMP DO SCHEDULE(STATIC)
+  !$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i) NUM_THREADS(4)
   DO i = 1,OMP_GET_NUM_THREADS()
-      print *, "Hello from Fortran thread ", OMP_GET_THREAD_NUM()
+      !OMP CRITICAL
+        print *, "Hello from Fortran thread ", OMP_GET_THREAD_NUM()
+      !OMP END CRITICAL
   END DO
-  !$OMP END DO
-  !$OMP END PARALLEL
+  !$OMP END PARALLEL DO
 
   hello_fortran = 0
   return
