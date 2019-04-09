@@ -1,30 +1,23 @@
 integer function hello_fortran()
-
-!*****************************************************************************80
-!
-!! MAIN is the main program for HELLO.
-!
-!  Discussion:
-!
-!    HELLO is a simple FORTRAN90 program that says "Hello, world!".
-!
-!  Licensing:
-!
-!    This code is distributed under the GNU LGPL license.
-!
-!  Modified:
-!
-!    18 May 2009
-!
-!  Author:
-!
-!    John Burkardt
-!
+  !*************!
+  !* set types *!
+  !*************!
   implicit none
 
-  write ( *, '(a)' ) 'Hello from Fortran 90!'
+  integer :: i
+  INTEGER :: OMP_GET_THREAD_NUM, OMP_GET_NUM_THREADS
+
+  !***********************!
+  !* perform calculation *!
+  !***********************!
+  !$OMP PARALLEL SHARED(i) NUM_THREADS(4)
+  !$OMP DO SCHEDULE(STATIC)
+  DO i = 1,OMP_GET_NUM_THREADS()
+      print *, "Hello from Fortran thread ", OMP_GET_THREAD_NUM()
+  END DO
+  !$OMP END DO
+  !$OMP END PARALLEL
 
   hello_fortran = 0
   return
-
 end
