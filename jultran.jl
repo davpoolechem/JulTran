@@ -1,4 +1,8 @@
-function julia90(filename_jl)
+module JulTran
+
+import TypeSetting
+
+function run(filename_jl)
     #**********************#
     #* read in julia file *#
     #**********************#
@@ -26,18 +30,10 @@ function julia90(filename_jl)
         end
     end
 
-
-    display(file[file_start:file_end])
-
     #***********************#
     #* handle type setting *#
     #***********************#
-    for i in file_start:file_end
-        if (occursin(r"[ *](.*)\:\:Int64",file[i]))
-            variable = match(r"[ *](.*)\:\:Int64",file[i])[1]
-            file[i] = replace(file[i],file[i]=>"    INTEGER :: $variable ")
-        end
-    end
+    file[file_start:file_end] = TypeSetting.run(file[file_start:file_end])
 
     #******************#
     #* handle do loop *#
@@ -101,5 +97,8 @@ function julia90(filename_jl)
         end
     close(f_f90)
 end
+export run
 
-julia90("hello.jl")
+end
+
+JulTran.run("examples/hello.jl")
