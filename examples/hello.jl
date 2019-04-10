@@ -1,22 +1,15 @@
 using Base.Threads
 
-function hello_julia_impl(mutex)
-    #*************#
-    #* set types *#
-    #*************#
+function hello_impl(mutex)
     i::Int64 = 0
 
-    #***********************#
-    #* perform calculation *#
-    #***********************#
     #OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i) NUM_THREADS(4)
     Threads.@threads for i in 1:1:Threads.nthreads()
         lock(mutex)
-        println("Hello from Julia thread ",Threads.threadid())
+        println("Hello from thread ",Threads.threadid())
         unlock(mutex)
-    end
+    end#do
     #END OMP PARALLEL DO
-    println("")
 end
 #endfxn
 

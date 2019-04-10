@@ -1,17 +1,11 @@
-function hello_julia_impl(mutex)
-    #*************#
-    #* set types *#
-    #*************#
+function hello_impl()
     INTEGER ::    i
 
-    #***********************#
-    #* perform calculation *#
-    #***********************#
     !$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i) NUM_THREADS(4)
-    DO i = 1,Threads.nthreads(), 1
+    DO i = 1, OMP_GET_NUM_THREADS(), 1
         !$OMP CRITICAL
-        println("Hello from Julia thread ",Threads.threadid())
+        PRINT *, "Hello from thread ",OMP_GET_THREAD_NUM()
         !$OMP END CRITICAL
-    end
+    END DO
     !$END OMP PARALLEL DO
-    println("")
+end

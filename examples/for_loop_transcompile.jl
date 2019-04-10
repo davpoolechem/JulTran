@@ -16,18 +16,23 @@ function julia90(filename_jl)
     #* extract function to be transcompiled *#
     #****************************************#
     for i in 1:length(file)
-        if (occursin("function hello_julia_impl",file[i]))
+        if (occursin("function hello_impl(mutex",file[i]))
             file_start = i
+            file[i] = replace(file[i],"function hello_impl(mutex"=>"function hello_impl(")
         end
         if (occursin("#endfxn",file[i]))
             file_end = i
+            file[i] = replace(file[i],"#endfxn"=>"")
         end
     end
+
+
+    display(file[file_start:file_end])
 
     #***********************#
     #* handle type setting *#
     #***********************#
-    for i in 1:length(file[file_start:file_end])
+    for i in file_start:file_end
         if (occursin(r"[ *](.*)\:\:Int64",file[i]))
             variable = match(r"[ *](.*)\:\:Int64",file[i])[1]
             file[i] = replace(file[i],file[i]=>"    INTEGER :: $variable ")
@@ -37,7 +42,7 @@ function julia90(filename_jl)
     #******************#
     #* handle do loop *#
     #******************#
-    for i in 1:length(file[file_start:file_end])
+    for i in file_start:file_end
         if (occursin(r"\#OMP PARALLEL DO",file[i]))
             file[i] = replace(file[i],r"\#OMP PARALLEL DO"=>"!\$OMP PARALLEL DO")
         end
@@ -64,6 +69,26 @@ function julia90(filename_jl)
         if (occursin(r"\#END OMP PARALLEL DO",file[i]))
             file[i] = replace(file[i],r"\#END OMP PARALLEL DO"=>"!\$END OMP PARALLEL DO")
         end
+
+        #printing
+        if (occursin(r"println\((.*)\)",file[i]))
+            regex = match(r"println\((.*)\)",file[i])
+
+            statement = regex[1]
+            file[i] = replace(file[i],r"println\((.*)\)"=>"PRINT *, $statement")
+        end
+
+        if (occursin("end#do",file[i]))
+            file[i] = replace(file[i],"end#do"=>"END DO")
+        end
+
+        #omp function matching
+        if (occursin("Threads.nthreads()",file[i]))
+            file[i] = replace(file[i],"Threads.nthreads()"=>"OMP_GET_NUM_THREADS()")
+        end
+        if (occursin("Threads.threadid()",file[i]))
+            file[i] = replace(file[i],"Threads.threadid()"=>"OMP_GET_THREAD_NUM()")
+        end
     end
 
     #*************************#
@@ -71,10 +96,10 @@ function julia90(filename_jl)
     #*************************#
 
     f_f90::IOStream = open(filename*"_fortran.f90","w")
-        for i in 1:length(file[file_start:file_end])
+        for i in file_start:file_end
             write(f_f90,file[i]*"\n")
         end
     close(f_f90)
 end
 
-julia90("examples/hello.jl")
+julia90("hello.jl")
