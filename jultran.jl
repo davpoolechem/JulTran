@@ -1,6 +1,8 @@
 module JulTran
 
 import TypeSetting
+import ParallelDo
+import GeneralOpenMP
 
 function run(filename_jl)
     #**********************#
@@ -20,9 +22,9 @@ function run(filename_jl)
     #* extract function to be transcompiled *#
     #****************************************#
     for i in 1:length(file)
-        if (occursin("function hello_impl(mutex",file[i]))
+        if (occursin(r"function .*\(mutex",file[i]))
             file_start = i
-            file[i] = replace(file[i],"function hello_impl(mutex"=>"function hello_impl(")
+            file[i] = replace(file[i],"(mutex"=>"(")
         end
         if (occursin("#endfxn",file[i]))
             file_end = i
@@ -30,42 +32,13 @@ function run(filename_jl)
         end
     end
 
-    #***********************#
-    #* handle type setting *#
-    #***********************#
     file[file_start:file_end] = TypeSetting.run(file[file_start:file_end])
 
-    #******************#
-    #* handle do loop *#
-    #******************#
+    file[file_start:file_end] = ParallelDo.run(file[file_start:file_end])
+
+    file[file_start:file_end] = GeneralOpenMP.run(file[file_start:file_end])
+
     for i in file_start:file_end
-        if (occursin(r"\#OMP PARALLEL DO",file[i]))
-            file[i] = replace(file[i],r"\#OMP PARALLEL DO"=>"!\$OMP PARALLEL DO")
-        end
-        if (occursin(r"for (.*) in (.*)",file[i]))
-            regex = match(r"for (.*) in (.*)",file[i])
-
-            variable = regex[1]
-            do_range = regex[2]
-
-            do_range_regex = match(r"for i in (.*):(.*):(.*)",file[i])
-
-            first = do_range_regex[1]
-            second = do_range_regex[2]
-            third = do_range_regex[3]
-
-            file[i] = replace(file[i],file[i]=>"    DO $variable = $first, $third, $second ")
-        end
-        if (occursin("lock(mutex)",file[i]) && !occursin("unlock(mutex)",file[i]))
-            file[i] = replace(file[i],"lock(mutex)"=>"!\$OMP CRITICAL")
-        end
-        if (occursin("unlock(mutex)",file[i]))
-            file[i] = replace(file[i],"unlock(mutex)"=>"!\$OMP END CRITICAL")
-        end
-        if (occursin(r"\#END OMP PARALLEL DO",file[i]))
-            file[i] = replace(file[i],r"\#END OMP PARALLEL DO"=>"!\$END OMP PARALLEL DO")
-        end
-
         #printing
         if (occursin(r"println\((.*)\)",file[i]))
             regex = match(r"println\((.*)\)",file[i])
@@ -76,14 +49,6 @@ function run(filename_jl)
 
         if (occursin("end#do",file[i]))
             file[i] = replace(file[i],"end#do"=>"END DO")
-        end
-
-        #omp function matching
-        if (occursin("Threads.nthreads()",file[i]))
-            file[i] = replace(file[i],"Threads.nthreads()"=>"OMP_GET_NUM_THREADS()")
-        end
-        if (occursin("Threads.threadid()",file[i]))
-            file[i] = replace(file[i],"Threads.threadid()"=>"OMP_GET_THREAD_NUM()")
         end
     end
 
