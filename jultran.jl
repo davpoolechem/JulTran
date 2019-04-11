@@ -3,6 +3,7 @@ module JulTran
 import TypeSetting
 import OMPControlFlow
 import GeneralOpenMP
+import FortranFunctions
 
 macro run(function_name::String, filename_jl::String)
     #**********************#
@@ -42,6 +43,8 @@ macro run(function_name::String, filename_jl::String)
     file[file_start:file_end] = OMPControlFlow.run(file[file_start:file_end])
 
     file[file_start:file_end] = GeneralOpenMP.run(file[file_start:file_end])
+
+    file[file_start:file_end] = FortranFunctions.run(file[file_start:file_end])
 
     for i in file_start:file_end
         #printing

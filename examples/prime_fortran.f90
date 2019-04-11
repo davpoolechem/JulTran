@@ -1,18 +1,18 @@
 FUNCTION is_prime(num)
-    LOGICAL ::    prime
-	num::Int64
-	denominator::Int64
+    LOGICAL :: prime
+    INTEGER :: num
+    INTEGER :: denominator
 
 	prime = .TRUE.
 
 	!$OMP PARALLEL SHARED(prime) PRIVATE(num,denominator) NUM_THREADS(4)
 
-        IF (num%2 == 0) THEN
+	   	IF (MOD(num,2) == 0) THEN
 			prime = .FALSE.
 	    ELSE
 			!$OMP DO SCHEDULE(STATIC)
-            DO denominator = 3, num-1, 2
-		    	IF (num%denominator == 0) THEN
+            DO denominator = 3, num-1, 2 
+		    	IF (MOD(num,denominator) == 0) THEN
 					prime = .FALSE.
 				END IF
 			END DO
