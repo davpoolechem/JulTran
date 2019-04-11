@@ -15,7 +15,7 @@ end#fxn
 function hello_julia()
     mutex = Threads.Mutex()
 
-    ccall((:hello_fortran_,"examples/fortran_functions.so"),Int64,())
+    ccall((:hello_impl_,"examples/fortran_functions.so"),Int64,())
 end
 
 hello_julia()
