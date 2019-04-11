@@ -60,11 +60,11 @@ macro run(function_name::String, filename_jl::String)
     #* write to fortran file *#
     #*************************#
 
-    f_f90::IOStream = open(filename*"_fortran.f95","w")
+    f_f95::IOStream = open(filename*"_fortran.f95","w")
         for i in file_start:file_end
-            write(f_f90,file[i]*"\n")
+            write(f_f95,file[i]*"\n")
         end
-    close(f_f90)
+    close(f_f95)
 end
 export run
 
