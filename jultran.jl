@@ -1,7 +1,7 @@
 module JulTran
 
 import TypeSetting
-import ParallelDo
+import OMPControlFlow
 import GeneralOpenMP
 
 macro run(function_name::String, filename_jl::String)
@@ -31,15 +31,15 @@ macro run(function_name::String, filename_jl::String)
                 file[i] = replace(file[i],"(mutex"=>"(")
             end
         end
-        if (occursin("#endfxn",file[i]))
+        if (occursin("end#fxn",file[i]))
             file_end = i
-            file[i] = replace(file[i],"#endfxn"=>"")
+            file[i] = replace(file[i],"end#fxn"=>"END")
         end
     end
 
     file[file_start:file_end] = TypeSetting.run(file[file_start:file_end])
 
-    file[file_start:file_end] = ParallelDo.run(file[file_start:file_end])
+    file[file_start:file_end] = OMPControlFlow.run(file[file_start:file_end])
 
     file[file_start:file_end] = GeneralOpenMP.run(file[file_start:file_end])
 
@@ -50,10 +50,6 @@ macro run(function_name::String, filename_jl::String)
 
             statement = regex[1]
             file[i] = replace(file[i],r"println\((.*)\)"=>"PRINT *, $statement")
-        end
-
-        if (occursin("end#do",file[i]))
-            file[i] = replace(file[i],"end#do"=>"END DO")
         end
     end
 
@@ -71,4 +67,4 @@ export run
 
 end
 
-JulTran.@run "hello_fortran" "examples/hello.jl"
+JulTran.@run "is_prime" "examples/prime.jl"

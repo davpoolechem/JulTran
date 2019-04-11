@@ -12,6 +12,7 @@ end
 
 @inline function run(subfile)
     set_types(subfile,"INTEGER","Int64")
+    set_types(subfile,"LOGICAL","Bool")
 
     return subfile
 end
