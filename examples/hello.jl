@@ -1,6 +1,6 @@
 using Base.Threads
 
-function hello_fortran(mutex)
+function hello_impl(mutex)
     i::Int64 = 0
 
     #OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i) NUM_THREADS(4)
@@ -10,8 +10,7 @@ function hello_fortran(mutex)
         unlock(mutex)
     end#do
     #END OMP PARALLEL DO
-end
-#endfxn
+end#fxn
 
 function hello_julia()
     mutex = Threads.Mutex()

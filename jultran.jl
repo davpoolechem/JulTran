@@ -56,6 +56,8 @@ macro run(function_name::String, filename_jl::String)
         end
     end
 
+    display(file[file_start:file_end])
+
     #*************************#
     #* write to fortran file *#
     #*************************#
@@ -70,4 +72,5 @@ export run
 
 end
 
-JulTran.@run "is_prime" "examples/prime.jl"
+JulTran.@run "hello_impl" "examples/hello.jl"
+#JulTran.@run "is_prime" "examples/prime.jl"
