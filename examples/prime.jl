@@ -16,10 +16,10 @@ function is_prime(num)
 					prime = false
 				end#if
 			end#do
-			#END OMP DO
+			#OMP END DO
 		end#if
 
-	#END OMP PARALLEL
+	#OMP END PARALLEL
 
     if (prime == true)
 		println("This number is prime!")

@@ -8,4 +8,4 @@ for i in *.f95; do
 gfortran -O3 -fopenmp -fPIC -std=f95 -c $i
 done
 
-gfortran -O3 -fopenmp -shared -fPIC -std=f95 -o fortran_functions.so hello_fortran.o  
+gfortran -O3 -fopenmp -shared -fPIC -std=f95 -o fortran_functions.so ${f95_files} 

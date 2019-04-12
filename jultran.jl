@@ -73,4 +73,4 @@ export run
 end
 
 JulTran.@run "hello_impl" "examples/hello.jl"
-#JulTran.@run "is_prime" "examples/prime.jl"
+JulTran.@run "is_prime" "examples/prime.jl"

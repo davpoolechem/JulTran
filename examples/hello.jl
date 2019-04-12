@@ -9,7 +9,7 @@ function hello_impl(mutex)
         println("Hello from thread ",Threads.threadid())
         unlock(mutex)
     end#do
-    #END OMP PARALLEL DO
+    #OMP END PARALLEL DO
 end#fxn
 
 function hello_julia()

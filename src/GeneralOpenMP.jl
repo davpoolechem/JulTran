@@ -7,8 +7,8 @@ function replace_parallel(subfile)
             subfile[i] = replace(subfile[i],"#OMP PARALLEL"=>"!\$OMP PARALLEL")
         end
 
-        if (occursin("#END OMP PARALLEL",subfile[i]))
-            subfile[i] = replace(subfile[i],"#END OMP PARALLEL"=>"!\$END OMP PARALLEL")
+        if (occursin("#OMP END PARALLEL",subfile[i]))
+            subfile[i] = replace(subfile[i],"#OMP END PARALLEL"=>"!\$OMP END PARALLEL")
         end
     end
 end
@@ -41,7 +41,6 @@ end
 #replace booleans
 function booleans(subfile)
     for i in 1:length(subfile)
-        #omp function matching
         if (occursin("true",subfile[i]))
             subfile[i] = replace(subfile[i],"true"=>".TRUE.")
         end
@@ -51,12 +50,24 @@ function booleans(subfile)
     end
 end
 
+#replace equivalence
+function equivalence(subfile)
+    for i in 1:length(subfile)
+        testbool::Bool = occursin(".TRUE.",subfile[i])
+        testbool = testbool || occursin(".FALSE.",subfile[i])
+        if (occursin("==",subfile[i]) && testbool)
+            subfile[i] = replace(subfile[i],"=="=>".eqv.")
+        end
+    end
+end
+
 @inline function run(subfile)
     add_critical(subfile)
     omp_functions(subfile)
     replace_parallel(subfile)
     booleans(subfile)
-    
+    equivalence(subfile)
+
     return subfile
 end
 export run

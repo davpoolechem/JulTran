@@ -24,11 +24,11 @@ function replace_do(subfile)
             subfile[i] = replace(subfile[i],subfile[i]=>"    DO $variable = $first, $third, $second ")
         end
 
-        if (occursin(r"#END OMP.*DO",subfile[i]))
+        if (occursin(r"#OMP END.*DO",subfile[i]))
             if (occursin("PARALLEL",subfile[i]))
-                subfile[i] = replace(subfile[i],"#END OMP PARALLEL DO"=>"!\$END OMP PARALLEL DO")
+                subfile[i] = replace(subfile[i],"#OMP END PARALLEL DO"=>"!\$OMP END PARALLEL DO")
             else
-                subfile[i] = replace(subfile[i],"#END OMP DO"=>"!\$END OMP DO")
+                subfile[i] = replace(subfile[i],"#OMP END DO"=>"!\$OMP END DO")
             end
         end
 
