@@ -27,3 +27,17 @@ function is_prime(num)
 		println("This number is not prime!")
 	end#if
 end#fxn
+
+function prime_julia()
+	int::Array{Int32} =  [ 2147483647 ]
+	pint = pointer_from_objref(int)
+
+	#int::Array{Int32} =  [ 2147483647 ]
+	#pint = Ref(int[1])
+
+	#ccall((:is_prime_,"examples/fortran_functions.so"),Int32,(Base.RefValue{Int32},),pint)
+    ccall((:is_prime_,"examples/fortran_functions.so"),Int32,(Base.RefValue{Array{Int32,1}},),pint)
+	#ccall((:hello_impl_,"examples/fortran_functions.so"),Int32,())
+end
+
+prime_julia()
